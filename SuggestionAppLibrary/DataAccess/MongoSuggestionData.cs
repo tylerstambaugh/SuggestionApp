@@ -87,9 +87,26 @@ public class MongoSuggestionData
 				suggestion.UserVotes.Remove(userId);
 			}
 
-			var userInTransaction = db.GetCollection<UserModel>(_db.UserCollectionName);
-			var user = (await userInTransaction.FindAsync(u => u.Id == userId)).First();
+			await suggestionsInTransaction.ReplaceOneAsync(s => s.Id == suggestionId, suggestion);
 
+			var usersInTransaction = db.GetCollection<UserModel>(_db.UserCollectionName);
+			var user = await _userData.GetUserById(suggestion.Author.Id);
+
+			if(isUpvote)
+			{
+				user.VotedOnSuggestions.Add(new BasicSuggestionModel(suggestion));
+			}
+			else
+			{
+				var suggestionToRemove = user.VotedOnSuggestions.Where(s => s.Id == suggestionId).First();
+				user.VotedOnSuggestions.Remove(new BasicSuggestionModel(suggestion));
+			}
+
+			await usersInTransaction.ReplaceOneAsync(u => u.Id == userId, user);
+
+			await session.CommitTransactionAsync();
+
+			_cache.Remove(CacheName);
 		}
 		catch (Exception ex)
 		{
