@@ -114,4 +114,32 @@ public class MongoSuggestionData
 			throw;
 		}
 	}
+
+	public async Task CreateSuggestion(SuggestionModel suggestion)
+	{
+		var client = _db.Client;
+
+		using var session = await client.StartSessionAsync();
+
+		session.StartTransaction();
+
+		try
+		{
+			var db = client.GetDatabase(_db.DbName);
+			var suggestionInTransaction = db.GetCollection<SuggestionModel>(_db.SuggestionCollectionName);
+			await suggestionInTransaction.InsertOneAsync(suggestion);
+
+			var usersInTransaction = db.GetCollection<UserModel>(_db.UserCollectionName);
+			var user = await _userData.GetUserById(suggestion.Author.Id);
+			user.AuthoredSuggestions.Add(new BasicSuggestionModel(suggestion));
+			await usersInTransaction.ReplaceOneAsync(u => u.Id == user.Id, user);
+
+		}
+
+		catch (Exception ex)
+		{
+			await session.AbortTransactionAsync();
+			throw;
+		}
+	}
 }
