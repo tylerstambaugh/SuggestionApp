@@ -134,8 +134,8 @@ public class MongoSuggestionData
 			user.AuthoredSuggestions.Add(new BasicSuggestionModel(suggestion));
 			await usersInTransaction.ReplaceOneAsync(u => u.Id == user.Id, user);
 
+			await session.CommitTransactionAsync();
 		}
-
 		catch (Exception ex)
 		{
 			await session.AbortTransactionAsync();
