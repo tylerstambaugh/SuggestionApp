@@ -3,7 +3,7 @@
 using Microsoft.Extensions.Caching.Memory;
 
 namespace SuggestionAppLibrary.DataAccess;
-public class MongoSuggestionData
+public class MongoSuggestionData : ISuggestionData
 {
 	private readonly IDbConnection _db;
 	private readonly IUserData _userData;
@@ -31,9 +31,9 @@ public class MongoSuggestionData
 			_cache.Set(CacheName, output, TimeSpan.FromMinutes(1));
 		}
 
-			return output;
+		return output;
 	}
-	
+
 	public async Task<List<SuggestionModel>> GetAllApprovedSuggestions()
 	{
 		var output = await GetAllSuggestions();
@@ -41,7 +41,7 @@ public class MongoSuggestionData
 		return output.Where(x => x.ApprovedForRelease).ToList();
 	}
 
-	public  async Task<SuggestionModel> GetSuggestion(string id)
+	public async Task<SuggestionModel> GetSuggestion(string id)
 	{
 		var results = await _suggestions.FindAsync(s => s.Id == id);
 
@@ -52,8 +52,8 @@ public class MongoSuggestionData
 	public async Task<List<SuggestionModel>> GetAllSuggestionsWaitingForApproval()
 	{
 		var output = await GetAllSuggestions();
-		return output.Where(x 
-			=> !x.ApprovedForRelease 
+		return output.Where(x
+			=> !x.ApprovedForRelease
 			&& !x.Rejected).ToList();
 	}
 
@@ -77,7 +77,7 @@ public class MongoSuggestionData
 
 			var suggestionsInTransaction = db.GetCollection<SuggestionModel>(_db.SuggestionCollectionName);
 			var suggestion = (await suggestionsInTransaction.FindAsync(s => s.Id == suggestionId)).First();
-			
+
 			//find out if already an upvote
 			bool isUpvote = suggestion.UserVotes.Add(userId);
 
@@ -92,7 +92,7 @@ public class MongoSuggestionData
 			var usersInTransaction = db.GetCollection<UserModel>(_db.UserCollectionName);
 			var user = await _userData.GetUserById(suggestion.Author.Id);
 
-			if(isUpvote)
+			if (isUpvote)
 			{
 				user.VotedOnSuggestions.Add(new BasicSuggestionModel(suggestion));
 			}
