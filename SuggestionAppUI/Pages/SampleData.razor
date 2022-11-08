@@ -1,0 +1,106 @@
+﻿@page "/SampleData"
+@inject ICategoryData categoryData
+@inject IStatusData statusData
+
+
+<h3>Sample Data</h3>
+
+@code {
+    private async Task CreateCategories()
+    {
+        var categories = await categoryData.GetAllCategories();
+        if (categories?.Count > 0)
+        {
+            return;
+        }
+
+        CategoryModel cat = new()
+            {
+                CategoryName = "Courses",
+                CategoryDescription = "Full Paid Courses"
+
+            };
+
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "Dev Questions",
+                CategoryDescription = "Advice on being dev"
+
+            };
+
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "In-Depth Tutorial",
+                CategoryDescription = "Deep dives on a topic"
+
+            };
+
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "10-Minute Training",
+                CategoryDescription = "A quick \"How to use this?\' video."
+
+            };
+
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "Other",
+                CategoryDescription = "n/a"
+
+            };
+
+        await categoryData.CreateCategory(cat);
+    }
+
+    private async Task CreateStatuses()
+    {
+        var statuses = await statusData.GetAllStatuses();
+
+        if(statuses?.Count > 0)
+        {
+            return;
+        }
+
+        StatusModel status = new()
+        {
+            StsatusName = "Completed",
+            StatusDescription = "y variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't a"
+        };
+
+        await statusData.CreateStatus(status);
+
+        status = new()
+            {
+                StsatusName = "Watching",
+                StatusDescription = "y variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't a"
+            };
+
+        await statusData.CreateStatus(status);
+
+        status = new()
+            {
+                StsatusName = "Upcoming",
+                StatusDescription = "y variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't a"
+            };
+
+        await statusData.CreateStatus(status);
+
+        status = new()
+            {
+                StsatusName = "Dismissed",
+                StatusDescription = "y variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't a"
+            };
+
+        await statusData.CreateStatus(status);
+
+
+    }
+}
